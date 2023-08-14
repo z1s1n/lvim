@@ -58,7 +58,6 @@ end
 
 lvim.colorscheme = "gruvbox"
 lvim.format_on_save.enabled = true
-lvim.lsp.installer.setup.automatic_installation = true
 lvim.lsp.document_highlight = true
 
 lvim.plugins = {
