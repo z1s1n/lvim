@@ -52,6 +52,9 @@ local options = {
 for k, v in pairs(options) do
     vim.opt[k] = v
 end
+vim.diagnostic.config({
+    underline = true
+})
 --------------------------------------------------------------------------------
 -- lvim
 --------------------------------------------------------------------------------
@@ -59,6 +62,7 @@ end
 lvim.colorscheme = "gruvbox"
 lvim.format_on_save.enabled = true
 lvim.lsp.document_highlight = true
+
 
 lvim.plugins = {
     { "ellisonleao/gruvbox.nvim" }
@@ -102,11 +106,29 @@ vim.api.nvim_create_autocmd({ "QuitPre" }, {
 --------------------------------------------------------------------------------
 -- go
 --------------------------------------------------------------------------------
-vim.api.nvim_create_autocmd('BufWritePre', {
-    pattern = '*.go',
+--vim.api.nvim_create_autocmd('BufWritePre', {
+--    pattern = '*.go',
+--    callback = function()
+--        vim.lsp.buf.code_action({ context = { only = { 'source.organizeImports' } }, apply = true })
+--    end
+--})
+vim.api.nvim_create_autocmd("BufWritePre", {
+    pattern = { "*.go" },
     callback = function()
-        vim.lsp.buf.code_action({ context = { only = { 'source.organizeImports' } }, apply = true })
-    end
+        local params = vim.lsp.util.make_range_params(nil, vim.lsp.util._get_offset_encoding())
+        params.context = { only = { "source.organizeImports" } }
+
+        local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 3000)
+        for _, res in pairs(result or {}) do
+            for _, r in pairs(res.result or {}) do
+                if r.edit then
+                    vim.lsp.util.apply_workspace_edit(r.edit, vim.lsp.util._get_offset_encoding())
+                else
+                    vim.lsp.buf.execute_command(r.command)
+                end
+            end
+        end
+    end,
 })
 --------------------------------------------------------------------------------
 -- py
