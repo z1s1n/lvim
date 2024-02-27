@@ -152,7 +152,7 @@ require 'lspconfig'.bashls.setup {}
 --------------------------------------------------------------------------------
 -- protobuf
 --------------------------------------------------------------------------------
-require 'lspconfig'.bufls.setup {}
-
-
-
+require 'lspconfig'.bufls.setup {
+    cmd = { "bufls", "serve" },
+    filetypes = { "proto" },
+}
